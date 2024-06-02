@@ -1,0 +1,48 @@
+Checklist
+
+Tools That Can Be Used
+Process Hacker
+Autoruns
+FullEventLogView
+LastActivityView
+BrowsingHistoryView
+
+Procedures That Must be Conducted for Memory Analysis
+Process Tree
+Web Connections
+Signature Status
+
+Users
+Net user
+Lusrmgr.msc
+Event ID 4720 - A user account was created
+Event ID 4732 - A member was added to a security-enabled local group
+
+Scheduled Tasks
+Autoruns, Event Viewer
+Event ID 4698 - A scheduled task was created
+Event ID 4702 - A scheduled task was updated
+Applications and Services Logs-Microsoft-Windows-TaskScheduler Operational.evtx
+
+Services
+
+Registry Run Keys / Startup Folder
+Event ID 4657: A registry value was modified
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunOnce
+HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run
+HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\UserShellFolders
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ShellFolders
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\ShellFolders
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\UserShellFolders
+HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunServicesOnce
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunServices
+HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunServices
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunServices
+HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\Run
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\Run
+
+Files
+AV scan
+Manual Search
