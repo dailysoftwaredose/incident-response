@@ -1,0 +1,198 @@
+Attackers use various persistence techniques in order to be able to access the compromised system at a later time. One of these methods is to ensure that the malicious programs, command or codes they have prepared are activated in the background. 
+
+
+Since the services are activated in the background, they give the attackers the option to re-start or activate with a different command in the case of the service not working properly. Thus, it is a commonly chosen method to ensure persistence. 
+
+
+Services can have different status according to their activation status. These status and their explanations are as stated below. 
+
+
+
+
+Active (running): The service is running in the background.
+Active (exited): Is the case of a service being successfully run but there is no daemon to be monitored. 
+Active (waiting): The service is running but is waiting for an event.
+Inactive: The service is not working.
+Enabled: Service is enabled at boot time.
+Disabled: Service is disabled and will not be started at Linux server boot time. 
+
+Understanding Service Configuration Files
+
+During the analysis procedure, we must be able to identify the anomalies and malicious behavior relating to suspicious services. For this reason, we must first understand what kind of a format the service configuration file has and what these variables mean. 
+
+
+Configuration files owned by services have the “.service” extension. You can make changes to these files with text editor. 
+
+
+
+
+Let’s examine the file structure through an example unit file. 
+
+
+
+
+Unit files are made up of sections. The sections are identified between the “[“ and “]” signs and are valid until the next section or until the end of the file. 
+
+
+[Unit] Section
+
+
+The “unit” section is usually used to complete the meta data in the unit or to configure the connection between the other units. The directives we will usually come across in the unit section is as follows: 
+
+
+Description: Is used to complete the explanations regarding the unit. 
+Requires: Contains the other required units in order for the unit to run successfully. If any of the units identified here are not running properly, the relevant unit is ended. 
+Before: Contains the units that must be run prior to the relevant unit being initiated. 
+
+[Install] Section
+
+
+This section is optional and is used to identify the actions when a unit is activated or deactivated. The directives you will usually come across in the install section is as below: 
+
+
+WantedBy: Is used to identify how the Unit is activated.
+
+[Service] Section
+
+
+This section is used to define the configurations of the service. The directives you will usually come across in the service section is as below: 
+
+
+ExecStart: Contains commands and arguments to initiate a service.
+ExecStartPre: Contains the commands and arguments needed prior to a service being initiated. 
+Restart: Contains information relating to which circumstances the system will restart. 
+
+Incident Response
+
+List All Services
+
+A list of services on the device should be obtained prior to analyzing the suspicious services. There is more than one method to obtain the services. 
+
+
+You may list all services on the device by using the service tool.
+
+
+service --status-all
+
+
+
+You can also list all of the services on the device by using the systemctl tool. 
+
+
+systemctl list-units --type=service
+
+
+
+Find Historical Data
+
+If the attacker will not use the service that he/she has created again, he/she may have deleted it from the device. In a situation like this, listing the recorded services might not be enough to identify the actions that the attacker has conducted on the services. 
+
+
+If the time frame of the cyber-attack is known, examining the services executed during this timeframe will help us accurately identify the TTP of the attacker. 
+
+
+Since we do not know the name of the service, we cannot conduct a specific search in the logs. At this point, we must evaluate the logs that have occurred during the attack’s timeframe. 
+
+
+sudo journalctl --since "2021-05-07 00:00" --until "2021-05-07 23:59"
+
+
+
+Due to the high number of logs, we may not be able to access the information we want easily. However, by filtering various words like unit or service we can continue our analysis with a less number of logs. 
+
+
+If we do have the name of the service, we can conduct our research in an easier manner. 
+
+
+sudo journalctl -u cron --since "2021-05-07 00:00" --until "2021-05-07 23:59"
+
+
+
+Analyze
+
+Now that we have suspicious services, we can start our analysis.
+
+
+Initially, we must collect information about the status of the service. We can access information about the status of the service and the location of the configuration file with the “service SERVICE_NAME status” command.
+
+
+service SERVICE_NAME status
+
+
+
+As a result of this command, we can access information relating to whether the service is actively running, where the configuration file is located, the PID value of the running process and the last couple of log information of the service. 
+
+
+We can access the same information through systemctl. 
+
+
+systemctl status SERVICE_NAME
+
+
+
+After learning the current status of the service and the location of the configuration file, we can now start to collect information about the service. 
+
+
+We can collect information regarding the service by opening the configuration file through any text editor. 
+
+
+cat /lib/systemd/system/cron.service
+
+
+
+The sections that we should specifically pay attention to in the configuration file is in the “service” section. Within the “ExecStart” directive of this section, the commands and programs that will execute when the service is activated are present. Attackers can input their own malicious commands into the “ExecStart” directive, and these commands can run in the background. 
+
+
+In addition, it is critically important that we identify when the services will run, and which users can run it. 
+
+
+We can identify when the configuration file for the system has been edited with the “stat” command. If you suspect that the attacker has changed a service or has created a new service, you can examine the information relating to the configuration file. 
+
+
+stat /lib/systemd/system/cron.service
+
+
+
+We must examine whether this service has been activated before, and if it has, we must examine its service logs. In order to view the logs for the service, we can use the journalctl tool. You can view logs relating to a specific service by using the “-u” parameter and inputting the name of the unit. 
+
+
+journalctl -u service-name.service
+
+
+
+If you want to limit your search to a determined time period, you can use the “--since” and “--until” parameters.
+
+
+sudo journalctl -u cron --since "2021-05-07 00:00" --until "2021-05-07 23:59"
+
+
+
+Eradication
+
+In the Eradication step of the incident response, the services created and changed by the attacker must be deleted and the system must be restored to its former state.
+
+
+In addition, we must stop the services created and changed by the attacker. We can stop the service with the commands below. 
+
+
+sudo systemctl stop SERVICE_NAME
+sudo service SERVICE_NAME stop
+
+
+
+In order to prevent the service from running automatically when the system is started, it must be disabled. You can disable the service with the help of the following command.
+
+
+sudo systemctl disable SERVICE_NAME
+
+
+
+We must remove the configurations and programs relating to the service from the file system. 
+
+
+rm  FILE_NAME
+
+The following command must be run for the changed configurations to take effect.
+
+
+sudo systemctl daemon-reload
