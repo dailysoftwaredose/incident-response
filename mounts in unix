@@ -1,0 +1,66 @@
+Mounts
+In UNIX operating systems, you can mount a different file system to your own device. Of course, attackers develop methods to use this feature for their own purposes.
+
+
+Ransomware attacks currently make up a significant number of cyber-attacks today. Cyber threat actors, by uploading ransomware to all devices located in the network, stop the system from working and by blocking the owners’ access to important information, force the victims to pay a ransom. 
+
+
+When we examine corporate network topologies, we can see that almost every company has a file share server. During ransomware attacks, file share servers have become the main targets of attackers. 
+
+
+Attackers use the file share servers during ransomware attacks for two goals: 
+
+
+Since file share servers generally have critical data, ransomware is uploaded to these servers to block the owners’ access to important information and force them to pay a ransom. 
+By hosting the ransomware malicious software in the file share servers, to upload ransomware malicious software through the file share server from the devices that the attacker has made access to. 
+
+One of the checks that an incident responder must do during a cyber-attack is to check whether any of the file systems that have been mounted by the compromised devices has been affected by the cyber-attack.
+
+
+Unfortunately, there is no mount/unmount log. Thus, if the attacker conducted a mount procedure and then unmounted it, we cannot identify this. However, sometimes, we can see logs regarding mounts within the dmesg.
+
+
+dmesg | grep mount
+
+
+
+Since the mount procedures are not logged, we cannot conduct a backward search. However, we can still conduct our analysis by identifying the file systems that are still mounted to the device. 
+
+
+Mount
+
+
+You can list the mounted file systems with the mount command.
+
+
+mount
+
+
+
+Findmnt
+
+
+Findmnt is another tool we can use to list the file systems that have been mounted. Since it is a more visually pleasing output than the other options, instead of wasting time to understand the other outputs, we can use the findmnt command. 
+
+
+Findmnt
+
+
+
+Df
+
+
+Df is a tool that we can use to get information about disks. With the -aTh parameter we can list the file systems that have been mounted.
+
+
+df -aTh
+
+
+
+/proc/mounts
+
+
+In order to identify the actively mounted file systems we can read the /proc/mounts file. 
+
+
+cat /proc/mounts
