@@ -1,0 +1,168 @@
+logo
+Home
+Learn
+Practice
+Challenge
+Pricing
+streak
+0
+Files and File System
+In a cyber attack event, various files are written to the file system. The attacker writes the malicious software he will use, the information he collects, the programs he will use to collect information into the file system at the time of the attack. It also makes changes on the files for purposes such as increasing rights and ensuring permanence.
+
+
+After the incident response, the device must be restored to its former working condition. If it will not be restored via snapshot or base image, the attacker's movements in the file system should be detected and these files should be cleaned.
+
+
+Before moving on to our analysis, let’s take a look at the Linux File System.
+
+
+
+boot: Contains all necessary files in order for the operating system to start
+opt:  Contains the files owned by the software that have been optionally added
+etc: Contains the configuration files
+bin: Contains the executable files
+sbin: Contains the files needed by the Superuser
+var: Contains the log files
+dev: Contains device files
+home: Contains the home files owned by users
+root: Is the home file for the root user
+usr: Contains the application and library files
+
+Incident Response
+
+Find Suspicious Files
+
+Suspicious Directories
+
+In order to identify the files the attacker has written into the file system, a good way to start would be to examine the commonly used directories by attackers. 
+
+
+The /tmp directory is one of the directories that must be examined during the time of the incident. The /tmp directory is a commonly used directory by attackers because it is an directory that every user has authorization to read and write. In addition, the files located in the /tmp directory are deleted after a certain amount of time. Thus, a late incident response means that we lose access to the evidence. 
+
+
+
+
+Another good point to start at would be to examine the directories that are open to the internet. For example, we may be able to identify the webshell files by examining the directories owned by the application for a server that serves web services. 
+
+
+In order to be able to identify directories that are open to the internet, we must initially need to identify these services. To identify the services open to the internet, we can get help from the netstat command. 
+
+
+For example, we can examine files that we believe look suspicious in the /var/www directory relating to a server that serves web services. 
+
+
+Suspicious File Extensions
+
+We must identify the malicious software, webshell’s, and files that are able to be run that the attacker has written into the file system. It is easier to identify these files because they have standard file extensions. 
+
+
+With the help of the find command below, we can identify the files with .sh, .php, .php7 and .elf extensions in the file system. 
+
+
+find / -type f \( -iname \*.php -o -iname \*.php7 -o -iname \*.sh -o -iname \*.elf \)
+
+
+
+Modification Time
+
+We can search files within the file system based on their modification time. 
+
+
+If the time period for the cyber-attack is known, examining the modified files during this time period would make it easier to find the files that have been modified by the attacker. 
+
+
+By using the find tool, we can search for the files within the file system based on modification time.  For example, with the help of the find tool below, we can list the files below the /tmp directory that have been modified between the dates of 10/25/2021 00:00:00 and 10/25/2021 23:59:00. 
+
+
+find /tmp -newermt "2021-10-25 00:00:00" ! -newermt "2021-10-25 23:59:00"
+
+
+
+Instead of determining a certain time frame, we can also filter by modification date prior to X or after X. 
+
+
+find / -mtime +X
+find / -mtime -X
+
+Owner
+
+While searching suspicious files, if we know the compromised users, conducting an analysis on files owned by compromised users may help you get quick results. 
+
+
+It is impossible to identify files modified by X user. However, we can identify files owned by X user. 
+
+
+By use of the find tool, we can identify all of the files owned by a certain user. For example, with the help of the command below, the files owned by the www-data user is listed under the /tmp directory. 
+
+
+find /tmp -user www-data
+
+
+
+Change Date
+
+When the ownership of a file, the directories in a file or the content of a file is changed by the attacker, the Change Date of the file changes. For various reasons, the attacker may change the authorizations and ownership of the file. 
+
+
+With the help of the find command, we can search based on change date. 
+
+
+find / -ctime +X
+
+Analyze
+
+When the suspicious files are identified, now these files must be analyzed. 
+
+
+Before putting the file into a static or dynamic analysis, we must first get more information about the file.
+
+
+By use of the stat tool, we can get detailed information about the file. 
+
+
+stat FILENAME
+
+
+
+After getting information about the file, we can move on to static analysis, dynamic analysis and code analysis.
+
+
+ Remediation
+
+In the remediation step of incident response, the modifications the attacker has made to the file system must be reverted to its normal state. The files that the attacker has written into the file system must be deleted and the files the attacker has modified must be reverted to its normal state. 
+
+
+If possible, it is healthier to revert the system with a clean image or a snapshot that was taken before the cyber-attack. 
+
+
+Lab Environment
+Questions Progress
+The attacker is known to upload webshell. What is the name of this file?
+
+Answer Format: ***************.***
+Hint
+SOCIAL
+RESOURCES
+Blog
+MITRE ATT&CK Map
+Dictionary
+Use Cases
+SUPPORT
+Contact us
+Help Center
+Forum
+Walkthroughs
+Videos
+Tour
+COMMUNITY
+Discord
+Contribute
+PLANS
+For individual
+For teams
+For students
+ROLES
+SOC Analyst
+Incident Responder
+Detection Engineer
+Course - LetsDefend
