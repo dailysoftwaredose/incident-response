@@ -1,0 +1,157 @@
+Cron is a tool for scheduling a task in UNIX operating systems. System administrators make frequent use of cron.
+
+
+This kind of feature is of course abused by attackers to ensure persistence.
+
+
+Terms like cron, crontab and cronjob are usually mixed up. First, let’s look at the differences in these terms. 
+
+
+Cron: The name of the tool that ensures the timing of jobs
+Cron job: Timed jobs are given the name of cron job
+Crontab: Is the configuration file that includes the cron jobs and that identifies when the cron jobs are supposed to work. 
+
+In short; Cron is the tool that executes the jobs (cron jobs) when they are scheduled and works with the help of the configuration file named crontab.
+
+
+Understanding Crontab
+
+Before we start our analysis, let’s look at how a crontab file looks.
+
+
+
+
+This crontab file is made up of 6 areas. These are:
+
+
+At what minute the cron job will be executed
+At what hour the cron job will be executed
+On which days of the month the cron job will be executed
+Which months the cron job will be executed
+Which days of the week the cron job will be executed
+And finally, the command that will be executed
+
+Examples:
+
+
+If we want a bashscript (for example /root/delete_backup.sh) to execute at the beginning of every hour, we must add a crontab like the example below.
+
+
+
+
+If we want to time the job to execute on the 1st of every month, we must add a crontab like the example below.
+
+
+
+
+In devices with a crontab entry like the one below, the bashscript “/root/delete_backup.sh” will execute every 15 minutes.
+
+
+
+
+Incident Response
+
+List All Cron Jobs
+
+Since each crontab file is different for each user, in order to identify all cron jobs, we must examine each crontab file separately. 
+
+
+Checking the system crontab
+
+We can first check the system crontab. Since only the authorized users can edit the system crontab, this file usually has the cron jobs that will help the system work normally. 
+
+
+With the help of the command line below, we can see the content of the crontab. 
+
+
+cat /etc/crontab
+
+
+
+Checking The System Drop-In Directory
+
+The system’s crontab files are located in the /etc/cron.d/ directory. To list all of the crontab files in this directory, you can use the command below. 
+
+
+cat /etc/cron.d/*
+
+
+
+User’s Crontab
+
+Each user has their own crontab file. To list all cron jobs by all users, you can use the command below. 
+
+
+cat /var/spool/cron/crontabs/*
+cat /var/spool/cron/*
+
+
+
+Historical Data
+
+Detecting only active cron jobs may not be sufficient to detect attacker cron job activities. In a situation where the attacker deletes the cron jobs he created because there is no need, it will not be possible to detect the activities of the attacker through active cron jobs.
+
+
+We can list the cron executions from the syslog. With the command below, we can filter the word CRON in the logs from the syslog. 
+
+
+cat /var/log/syslog | grep CRON
+
+
+
+With the Journalctl tool, you can detect cron jobs running through the logs of the cron service.
+
+
+journalctl -u cron
+
+
+
+By using the “--since” ve “--until” parameters with the journaltcl tool, we can list the Cron executions during the time frame of the attack. 
+
+
+journalctl -u cron --since "2021-05-07 00:00" --until "2021-05-07 23:59"
+
+
+
+Analyze
+
+After the cron jobs in the system are identified, we can start analyzing these cron jobs. 
+
+
+First we need to understand when the cron job will run. Crontab files have a specific format. As we mentioned in the "Understanding Crontab" title, it is possible to schedule a cron job in various ways.
+
+
+Then the command/script to be run should be examined. Attackers often add the reverse shell command as a cron job. Such commands must be determined in the crontab.
+
+
+A good starting point for our cron job examination is to analyze the cron jobs that have been executed from suspicious locations. For example, a bash script that is being executed under a /tmp directory is suspicious. 
+
+
+
+
+In addition, the names and parameters of the program that will be executed must be carefully examined. The scripts with names like “backdoor”, “rev”, or “shell” must be quickly examined. 
+
+
+After identifying the malicious cron jobs, we must check whether these cron jobs have been executed before or not. By examining the cron logs, we can identify whether these cron jobs have been executed in the past or not. 
+
+
+We can list cron logs with the commands below. 
+
+
+cat /var/log/syslog | grep CRON
+journalctl -u cron --since "2021-05-07 00:00" --until "2021-05-07 23:59"
+
+Eradication
+
+During the eradication step of incident response, we must delete the cron jobs added by the attacker and revert the cron jobs that have been changed by the attacker. 
+
+
+We can conduct changes on the crontab with the command below. 
+
+
+crontab -e
+
+To edit a crontab owned by a different user, we can use the “-u” parameter. 
+
+
+crontab -u USERNAME -e
