@@ -1,0 +1,60 @@
+The attackers establish a network connection between the systems they have seized and their own systems, thus ensuring the communication of two devices. With this connection, the attacker is able to send and receive data to the system he/she has hacked.
+
+
+Attackers often prefer to receive a reverse shell over the device, even if they have Webshell in order to move more easily in the system they have seized. In addition to being able to move more easily, the victim device is connected to the attacker's device with a reverse shell, thus bypassing security products more easily.
+
+
+As an incident responder, we must identify these connections and analyze the traffic running through these connections. 
+
+
+Listing Active Network Connections
+
+Due to its ease of use and since it is usually already installed by default, “netstat” is probably the most preferred tool. 
+
+
+You can list all network connection with the “netstat -a” command. 
+
+
+netstat -a
+
+
+
+You can only list the network connections of the TCP protocol with the "netstat -at" command. The "-n" parameter allows you to get faster results by turning off the reverse DNS lookup.
+
+
+netstat -ant
+
+
+
+In order to maintain persistence in a system, attackers choose to upload a backdoor in the system. When attackers want to access the system again, they use the backdoor they have created and can easily continue to access the system. The easiest way to identify backdoors like these is to examine the ports that device has listened to. 
+
+
+With the “netstat -l” command, we can list the ports that the device has listened to. 
+
+
+netstat -l
+
+
+
+During the incident response procedure, we must pay attention to all ports listened to from all interfaces. A good point to start the analysis is to analyze the ports that are not used by default by known applications. 
+
+
+As can be seen in the image above, by default, there is no information about which processes make these connections.
+
+
+When we provide the "-p" parameter to the netstat command, the information about which processes the network connections are made is also printed.
+
+
+netstat -nlpt
+
+
+
+IPTables
+
+The attacker may have made changes to the firewall rules. These rules must be examined. 
+
+
+You can list all iptables rules with the “iptables -L” command. 
+
+
+iptables -L
