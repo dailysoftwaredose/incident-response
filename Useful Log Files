@@ -1,0 +1,30 @@
+Useful Log Files
+As an incident responder, we must know which actions on the system are recorded, where these actions are stored, and how we can use this information during our incident response procedure. 
+
+
+Below, you can find a table that shows commonly used log files during incident response procedures and what information is stored in each file. 
+
+
+File	syslog
+Location	/var/log/syslog
+/var/log/messages
+Contents	Execution of cron jobs
+Execution of services
+
+File	access.log
+Location	/var/log/apache2/access.log
+/var/log/nginx/access.log
+Contents	Web requests
+
+File	auth.log
+Location	/var/log/auth.log
+/var/log/secure
+Contents	Logon eventsUser creation eventsGroup eventsUser change events
+
+File	lastlog
+Location	/var/log/lastlog
+Contents	Last logon information
+
+File	bash_history
+Location	~/.bash_history
+Contents	Executed commands through terminal
